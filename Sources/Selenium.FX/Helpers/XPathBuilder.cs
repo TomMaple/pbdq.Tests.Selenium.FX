@@ -24,6 +24,13 @@ namespace pbdq.Tests.Selenium.FX.Helpers
             return tagName;
         }
 
+        internal static string GetAttributePart(string attibuteName, string attributeValue)
+        {
+            ValidateForQName(attibuteName, "Attribute Name");
+
+            return $"[@{attibuteName}]";
+        }
+
         #region Validation methods
 
         private static void ValidateForQName(string qName, string elementTypeName)
