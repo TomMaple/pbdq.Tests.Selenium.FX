@@ -8,9 +8,15 @@ namespace pbdq.Tests.Selenium.FX.Helpers
 {
     internal class XPathBuilder
     {
-        internal static string GetTagNamePart(string tagName)
+        internal static string GetTagNamePart(string tagName, bool isLocalName = false)
         {
-            ValidateForQName(tagName, "Tag Name");
+            if (isLocalName)
+                ValidateForNCName(tagName, "Tag Name");
+            else
+                ValidateForQName(tagName, "Tag Name");
+
+            if (isLocalName)
+                return $"*[local-name()='{tagName}']";
 
             if (IsReservedFunctionName(tagName))
                 return $"*[name()='{tagName}']";
@@ -68,7 +74,8 @@ namespace pbdq.Tests.Selenium.FX.Helpers
 
         private static bool IsReservedFunctionName(string name)
         {
-            return ReservedFunctionNames.Contains(name);
+            var parts = name.Split(':');
+            return parts.Any(part => ReservedFunctionNames.Contains(part));
         }
 
         #region Character validation methods
