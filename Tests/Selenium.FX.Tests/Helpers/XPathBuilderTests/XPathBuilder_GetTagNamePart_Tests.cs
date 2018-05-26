@@ -78,7 +78,7 @@ namespace pbdq.Tests.Selenium.FX.Tests.Helpers.XPathBuilderTests
         }
 
         [Fact]
-        public void when_creating_xpath_tagName_containing_tag()
+        public void when_creating_xpath_tagName_containing_tab()
         {
             var exception = Record.Exception(() => XPathBuilder.GetTagNamePart("di\tv"));
 
@@ -136,7 +136,7 @@ namespace pbdq.Tests.Selenium.FX.Tests.Helpers.XPathBuilderTests
         }
 
         [Fact]
-        public void when_creating_xpath_tagName_starting_with_colons()
+        public void when_creating_xpath_tagName_with_colons()
         {
             var exception = Record.Exception(() => XPathBuilder.GetTagNamePart("abc:def:div"));
 

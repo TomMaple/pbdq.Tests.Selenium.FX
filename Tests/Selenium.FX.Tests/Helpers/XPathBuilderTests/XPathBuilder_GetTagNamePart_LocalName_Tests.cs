@@ -78,7 +78,7 @@ namespace pbdq.Tests.Selenium.FX.Tests.Helpers.XPathBuilderTests
         }
 
         [Fact]
-        public void when_creating_xpath_tagName_containing_tag()
+        public void when_creating_xpath_tagName_containing_tab()
         {
             var exception = Record.Exception(() => XPathBuilder.GetTagNamePart("di\tv", true));
 
