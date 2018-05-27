@@ -7,143 +7,74 @@ namespace pbdq.Tests.Selenium.FX.Tests.Helpers.XPathBuilderTests
 {
     public class XPathBuilder_GetAttributePart_Tests
     {
-        [Fact]
-        public void when_creating_xpath_attribute_with_nulls()
-        {
-            var exception = Record.Exception(() => XPathBuilder.GetAttributePart(null, null));
+        #region valid input data
 
-            exception.ShouldNotBeNull();
-            exception.ShouldBeType<ArgumentNullException>();
-            exception.Message.ShouldEqual("Attribute Name cannot be null.");
+        [Theory]
+        [InlineData(null, null, "[@*]")]
+        [InlineData(null, "", "[@*='']")]
+        [InlineData(null, "en", "[@*='en']")]
+        [InlineData("lang", null, "[@lang]")]
+        [InlineData("lang", "", "[@lang='']")]
+        [InlineData("lang", "en", "[@lang='en']")]
+        [InlineData("a", "5", "[@a='5']")]
+        [InlineData("STYLE", null, "[@STYLE]")]
+        [InlineData("abc:class", null, "[@abc:class]")]
+        [InlineData("main-lang", "en", "[@main-lang='en']")]
+        [InlineData("_lang", "en", "[@_lang='en']")]
+        [InlineData("名字", null, "[@名字]")]
+        public void when_creating_xpath_attribute_with_valid_values(string attributeName, string attributeValue, string expectedResult)
+        {
+            var result = XPathBuilder.GetAttributePart(attributeName, attributeValue);
+            result.ShouldEqual(expectedResult);
         }
 
-        [Fact]
-        public void when_creating_xpath_attribute_with_empty_name()
+        [Theory]
+        [InlineData("text", "text", "[@text='text']")]
+        public void when_creating_xpath_attribute_with_reserved_names(string attributeName, string attributeValue, string expectedResult)
         {
-            var exception = Record.Exception(() => XPathBuilder.GetAttributePart(string.Empty, null));
-
-            exception.ShouldNotBeNull();
-            exception.ShouldBeType<ArgumentException>();
-            exception.Message.ShouldEqual("Attribute Name cannot be empty.");
+            var result = XPathBuilder.GetAttributePart(attributeName, attributeValue);
+            result.ShouldEqual(expectedResult);
         }
 
-        [Fact]
-        public void when_creating_xpath_attribute_with_name_containing_space()
+        #endregion
+
+        #region invalid input data
+
+        [Theory]
+        [InlineData("", "Attribute Name cannot be empty.")]
+        [InlineData(" lang", "Attribute Name contains invalid character “ ”.")]
+        [InlineData("l ang", "Attribute Name contains invalid character “ ”.")]
+        [InlineData("l\tang", "Attribute Name contains invalid character “\t”.")]
+        [InlineData("lang ", "Attribute Name contains invalid character “ ”.")]
+        [InlineData("l'ang", "Attribute Name contains invalid character “'”.")]
+        [InlineData("l\"ang", "Attribute Name contains invalid character “\"”.")]
+        [InlineData("*", "Attribute Name contains invalid character “*”.")]
+        [InlineData("1lang", "Attribute Name cannot start with “1”.")]
+        [InlineData("-lang", "Attribute Name cannot start with “-”.")]
+        public void when_creating_xpath_attribute_with_invalid_attibute_name(string name, string expectedErrorMessage)
         {
-            var exception = Record.Exception(() => XPathBuilder.GetAttributePart("l ang", null));
-
-            exception.ShouldNotBeNull();
-            exception.ShouldBeType<ArgumentException>();
-            exception.Message.ShouldEqual("Attribute Name contains invalid character “ ”.");
-        }
-
-        [Fact]
-        public void when_creating_xpath_attribute_with_name_starting_with_colon()
-        {
-            var exception = Record.Exception(() => XPathBuilder.GetAttributePart(":class", null));
-
-            exception.ShouldNotBeNull();
-            exception.ShouldBeType<ArgumentException>();
-            exception.Message.ShouldEqual("Attribute Name prefix cannot be empty.");
-        }
-
-        [Fact]
-        public void when_creating_xpath_attribute_with_name_ending_with_colon()
-        {
-            var exception = Record.Exception(() => XPathBuilder.GetAttributePart("class:", null));
-
-            exception.ShouldNotBeNull();
-            exception.ShouldBeType<ArgumentException>();
-            exception.Message.ShouldEqual("Attribute Name cannot be empty.");
-        }
-
-        [Fact]
-        public void when_creating_xpath_attribute_with_name_containing_tab()
-        {
-            var exception = Record.Exception(() => XPathBuilder.GetAttributePart("l\tang", null));
+            var exception = Record.Exception(() => XPathBuilder.GetAttributePart(name, null));
 
             exception.ShouldNotBeNull();
             exception.ShouldBeType<ArgumentException>();
-            exception.Message.ShouldEqual("Attribute Name contains invalid character “\t”.");
+            exception.Message.ShouldEqual(expectedErrorMessage);
         }
 
-        [Fact]
-        public void when_creating_xpath_attribute_with_name_containing_quotation_mark()
+        [Theory]
+        [InlineData(":abc", "Attribute Name prefix cannot be empty.")]
+        [InlineData("abc:", "Attribute Name cannot be empty.")]
+        [InlineData("abc:def:", "Attribute Name cannot contain more than 1 colon.")]
+        [InlineData("abc::def", "Attribute Name cannot contain more than 1 colon.")]
+        [InlineData("abc:def:div", "Attribute Name cannot contain more than 1 colon.")]
+        public void when_creating_xpath_attribute_with_invalid_format(string name, string expectedErrorMessage)
         {
-            var exception = Record.Exception(() => XPathBuilder.GetAttributePart("l\"ang", null));
-
-            exception.ShouldNotBeNull();
-            exception.ShouldBeType<ArgumentException>();
-            exception.Message.ShouldEqual("Attribute Name contains invalid character “\"”.");
-        }
-
-        [Fact]
-        public void when_creating_xpath_attribute_with_name_containing_apostrophe()
-        {
-            var exception = Record.Exception(() => XPathBuilder.GetAttributePart("l'ang", null));
-
-            exception.ShouldNotBeNull();
-            exception.ShouldBeType<ArgumentException>();
-            exception.Message.ShouldEqual("Attribute Name contains invalid character “'”.");
-        }
-
-        [Fact]
-        public void when_creating_xpath_attribute_with_name_from_single_letter()
-        {
-            var result = XPathBuilder.GetAttributePart("a", null);
-            result.ShouldEqual("[@a]");
-        }
-
-        [Fact]
-        public void when_creating_xpath_attribute_with_name_from_valid_attribute_name()
-        {
-            var result = XPathBuilder.GetAttributePart("class", null);
-            result.ShouldEqual("[@class]");
-        }
-
-        [Fact]
-        public void when_creating_xpath_attribute_with_name_from_uppercase_valid_attribute_name()
-        {
-            var result = XPathBuilder.GetAttributePart("STYLE", null);
-            result.ShouldEqual("[@STYLE]");
-        }
-
-        [Fact]
-        public void when_creating_xpath_attribute_with_name_from_prefixed_attribute_name()
-        {
-            var result = XPathBuilder.GetAttributePart("abc:class", null);
-            result.ShouldEqual("[@abc:class]");
-        }
-
-        [Fact]
-        public void when_creating_xpath_attribute_with_colons()
-        {
-            var exception = Record.Exception(() => XPathBuilder.GetAttributePart("abc:def:div", null));
+            var exception = Record.Exception(() => XPathBuilder.GetAttributePart(name, null));
 
             exception.ShouldNotBeNull();
             exception.ShouldBeType<FormatException>();
-            exception.Message.ShouldEqual("Attribute Name cannot contain more than 1 colon.");
+            exception.Message.ShouldEqual(expectedErrorMessage);
         }
-
-        [Fact]
-        public void when_creating_xpath_attribute_with_dash()
-        {
-            var result = XPathBuilder.GetAttributePart("main-lang", null);
-            result.ShouldEqual("[@main-lang]");
-        }
-
-        [Fact]
-        public void when_creating_xpath_attribute_with_non_ASCII_characters()
-        {
-            var result = XPathBuilder.GetAttributePart("名字", null);
-            result.ShouldEqual("[@名字]");
-        }
-
-        [Fact]
-        public void when_creating_xpath_attribute_from_reserved_name()
-        {
-            var result = XPathBuilder.GetAttributePart("text", null);
-            result.ShouldEqual("[@text]");
-        }
+        
+        #endregion
     }
 }

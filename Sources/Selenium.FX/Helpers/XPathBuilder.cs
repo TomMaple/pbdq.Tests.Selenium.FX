@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text;
 
 [assembly: InternalsVisibleTo("Selenium.FX.Tests")]
 
@@ -31,12 +32,81 @@ namespace pbdq.Tests.Selenium.FX.Helpers
             return tagName;
         }
 
-        internal static string GetAttributePart(string attibuteName, string attributeValue)
+        internal static string GetAttributePart(string attributeName, string attributeValue)
         {
-            ValidateForQName(attibuteName, "Attribute Name");
+            if (attributeName != null)
+                ValidateForQName(attributeName, "Attribute Name");
 
-            return $"[@{attibuteName}]";
+            var namePart = attributeName != null
+                ? $"@{attributeName}"
+                : "@*";
+
+            string valuePart = null;
+            if (attributeValue != null)
+            {
+                var encodedValue = EncodeAttributeValue(attributeValue);
+                valuePart = $"='{encodedValue}'";
+            }
+
+            return $"[{namePart}{valuePart}]";
         }
+
+        #region Encode attribute value
+
+        // TODO: update according to https://referencesource.microsoft.com/#System.Xml/System/Xml/Core/XmlTextEncoder.cs : Write() (for full support of Unicode)
+        private static string EncodeAttributeValue(string attributeValue)
+        {
+            if (attributeValue == null)
+                throw new ArgumentNullException("Value to decode cannot be null.", (Exception) null);
+
+            var decodedOutput = new StringBuilder();
+            foreach (var character in attributeValue)
+            {
+                string decodedChar;
+
+                switch (character)
+                {
+                    case (char) 0xA:
+                    case (char) 0xD:
+                        decodedChar = CreateXmlEntityFromCharacter(character);
+                        break;
+                    case '<':
+                        decodedChar = CreateXmlEntityFromName("lt");
+                        break;
+                    case '>':
+                        decodedChar = CreateXmlEntityFromName("gt");
+                        break;
+                    case '&':
+                        decodedChar = CreateXmlEntityFromName("amp");
+                        break;
+                    case '\'':
+                        decodedChar = CreateXmlEntityFromName("apos");
+                        break;
+                    default:
+                        decodedChar = character < 0x20 || character > 0xFFFD
+                            ? CreateXmlEntityFromCharacter(character)
+                            : character.ToString();
+                        break;
+                }
+
+                decodedOutput.Append(decodedChar);
+            }
+
+            return decodedOutput.ToString();
+        }
+
+        private static string CreateXmlEntityFromCharacter(char character)
+        {
+            var hexCode = ((int) character).ToString("X");
+            return $"&#x{hexCode};";
+        }
+
+        private static string CreateXmlEntityFromName(string name)
+        {
+            return $"&{name};";
+        }
+
+        #endregion
 
         #region Validation methods
 
