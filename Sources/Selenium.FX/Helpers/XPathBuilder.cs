@@ -10,6 +10,13 @@ namespace pbdq.Tests.Selenium.FX.Helpers
     {
         internal static string GetTagNamePart(string tagName, bool isLocalName = false)
         {
+            if (tagName == null)
+            {
+                return isLocalName
+                    ? throw new ArgumentNullException("Tag Name cannot be null.", (Exception) null)
+                    : "*";
+            }
+
             if (isLocalName)
                 ValidateForNCName(tagName, "Tag Name");
             else
@@ -36,17 +43,18 @@ namespace pbdq.Tests.Selenium.FX.Helpers
         private static void ValidateForQName(string qName, string elementTypeName)
         {
             if (qName == null)
-                throw new ArgumentNullException($"{elementTypeName} cannot be null.", (Exception)null);
+                throw new ArgumentNullException($"{elementTypeName} cannot be null.", (Exception) null);
 
-            if (qName.Length < 1)
-                throw new ArgumentException($"{elementTypeName} cannot be empty.", (Exception)null);
+            if (qName == string.Empty)
+                throw new ArgumentException($"{elementTypeName} cannot be empty.", (Exception) null);
 
             var parts = qName.Split(':');
             if (parts.Length > 2)
                 throw new FormatException($"{elementTypeName} cannot contain more than 1 colon.");
-
             if (parts[0] == string.Empty)
-                throw new ArgumentException($"{elementTypeName} prefix cannot be empty.", (Exception)null);
+                throw new FormatException($"{elementTypeName} prefix cannot be empty.", null);
+            if (parts.Length > 1 && parts[1] == string.Empty)
+                throw new FormatException($"{elementTypeName} cannot be empty.", null);
 
             foreach (var part in parts)
                 ValidateForNCName(part, elementTypeName);
@@ -55,21 +63,21 @@ namespace pbdq.Tests.Selenium.FX.Helpers
         private static void ValidateForNCName(string ncName, string elementTypeName)
         {
             if (ncName == null)
-                throw new ArgumentNullException($"{elementTypeName} cannot be null.", (Exception)null);
+                throw new ArgumentNullException($"{elementTypeName} cannot be null.", (Exception) null);
 
-            if (ncName.Length < 1)
-                throw new ArgumentException($"{elementTypeName} cannot be empty.", (Exception)null);
+            if (ncName == string.Empty)
+                throw new ArgumentException($"{elementTypeName} cannot be empty.", (Exception) null);
 
             if (ncName.IndexOf(':') != -1)
-                throw new ArgumentException($"{elementTypeName} contains invalid character “:”.", (Exception)null);
+                throw new ArgumentException($"{elementTypeName} contains invalid character “:”.", (Exception) null);
 
-            if (IsNameStartChar(ncName[0]) == false)
-                throw new ArgumentException($"{elementTypeName} cannot start with “{ncName[0]}”.", (Exception)null);
-
-            for (var i = 1; i < ncName.Length; i++)
+            for (var i = 0; i < ncName.Length; i++)
             {
                 if (IsNameChar(ncName[i]) == false)
-                    throw new ArgumentException($"{elementTypeName} contains invalid character “{ncName[i]}”.", (Exception)null);
+                    throw new ArgumentException($"{elementTypeName} contains invalid character “{ncName[i]}”.", (Exception) null);
+                
+                if (i == 0 && IsNameStartChar(ncName[i]) == false)
+                    throw new ArgumentException($"{elementTypeName} cannot start with “{ncName[0]}”.", (Exception) null);
             }
         }
 

@@ -7,163 +7,109 @@ namespace pbdq.Tests.Selenium.FX.Tests.Helpers.XPathBuilderTests
 {
     public class XPathBuilder_GetTagNamePart_Tests
     {
-        [Fact]
-        public void when_creating_xpath_tagName_from_null()
+        #region valid input data
+
+        [Theory]
+        [InlineData(null, "*")]
+        [InlineData("a", "a")]
+        [InlineData("LI", "LI")]
+        [InlineData("div", "div")]
+        [InlineData("abc:table", "abc:table")]
+        [InlineData("book-title", "book-title")]
+        [InlineData("书", "书")]
+        public void when_creating_xpath_tag_with_valid_values(string tagName, string expectedResult)
         {
-            var exception = Record.Exception(() => XPathBuilder.GetTagNamePart(null));
+            var result = XPathBuilder.GetTagNamePart(tagName);
+            result.ShouldEqual(expectedResult);
+        }
+
+        [Theory]
+        [InlineData("a", "*[local-name()='a']")]
+        [InlineData("LI", "*[local-name()='LI']")]
+        [InlineData("div", "*[local-name()='div']")]
+        [InlineData("book-title", "*[local-name()='book-title']")]
+        [InlineData("书", "*[local-name()='书']")]
+        public void when_creating_xpath_local_tag_with_valid_values(string tagName, string expectedResult)
+        {
+            var result = XPathBuilder.GetTagNamePart(tagName, isLocalName: true);
+            result.ShouldEqual(expectedResult);
+        }
+
+        [Theory]
+        [InlineData("text", false, "*[name()='text']")]
+        [InlineData("text", true, "*[local-name()='text']")]
+        public void when_creating_xpath_tag_with_reserved_names(string tagName, bool isLocalName, string expectedResult)
+        {
+            var result = XPathBuilder.GetTagNamePart(tagName, isLocalName);
+            result.ShouldEqual(expectedResult);
+        }
+
+        #endregion
+
+        #region invalid input data
+
+        [Fact]
+        public void when_creating_xpath_local_tag_with_null_value()
+        {
+            var exception = Record.Exception(() => XPathBuilder.GetTagNamePart(null, isLocalName: true));
 
             exception.ShouldNotBeNull();
             exception.ShouldBeType<ArgumentNullException>();
             exception.Message.ShouldEqual("Tag Name cannot be null.");
         }
 
-        [Fact]
-        public void when_creating_xpath_tagName_from_empty_text()
+        [Theory]
+        [InlineData("", "Tag Name cannot be empty.")]
+        [InlineData(" div", "Tag Name contains invalid character “ ”.")]
+        [InlineData("di v", "Tag Name contains invalid character “ ”.")]
+        [InlineData("div ", "Tag Name contains invalid character “ ”.")]
+        [InlineData("di\tv", "Tag Name contains invalid character “\t”.")]
+        [InlineData("di\"v", "Tag Name contains invalid character “\"”.")]
+        [InlineData("di'v", "Tag Name contains invalid character “'”.")]
+        public void when_creating_xpath_tag_with_invalid_tag_name(string tagName, string expectedErrorMessage)
         {
-            var exception = Record.Exception(() => XPathBuilder.GetTagNamePart(string.Empty));
+            var exception = Record.Exception(() => XPathBuilder.GetTagNamePart(tagName));
 
             exception.ShouldNotBeNull();
             exception.ShouldBeType<ArgumentException>();
-            exception.Message.ShouldEqual("Tag Name cannot be empty.");
+            exception.Message.ShouldEqual(expectedErrorMessage);
         }
 
-        [Fact]
-        public void when_creating_xpath_tagName_containing_space()
+        [Theory]
+        [InlineData("", "Tag Name cannot be empty.")]
+        [InlineData(" div", "Tag Name contains invalid character “ ”.")]
+        [InlineData("di v", "Tag Name contains invalid character “ ”.")]
+        [InlineData("div ", "Tag Name contains invalid character “ ”.")]
+        [InlineData("di\tv", "Tag Name contains invalid character “\t”.")]
+        [InlineData("di\"v", "Tag Name contains invalid character “\"”.")]
+        [InlineData("di'v", "Tag Name contains invalid character “'”.")]
+        [InlineData(":div", "Tag Name contains invalid character “:”.")]
+        [InlineData("di:v", "Tag Name contains invalid character “:”.")]
+        [InlineData("div:", "Tag Name contains invalid character “:”.")]
+        public void when_creating_xpath_local_tag_with_invalid_tag_name(string tagName, string expectedErrorMessage)
         {
-            var exception = Record.Exception(() => XPathBuilder.GetTagNamePart("di v"));
+            var exception = Record.Exception(() => XPathBuilder.GetTagNamePart(tagName, isLocalName: true));
 
             exception.ShouldNotBeNull();
             exception.ShouldBeType<ArgumentException>();
-            exception.Message.ShouldEqual("Tag Name contains invalid character “ ”.");
+            exception.Message.ShouldEqual(expectedErrorMessage);
         }
 
-        [Fact]
-        public void when_creating_xpath_tagName_starting_with_space()
+        [Theory]
+        [InlineData(":div", "Tag Name prefix cannot be empty.")]
+        [InlineData("div:", "Tag Name cannot be empty.")]
+        [InlineData("abc::div", "Tag Name cannot contain more than 1 colon.")]
+        [InlineData("abc:div:", "Tag Name cannot contain more than 1 colon.")]
+        [InlineData("abc:def:div", "Tag Name cannot contain more than 1 colon.")]
+        public void when_creating_xpath_tag_with_invalid_format(string tagName, string expectedErrorMessage)
         {
-            var exception = Record.Exception(() => XPathBuilder.GetTagNamePart(" div"));
-
-            exception.ShouldNotBeNull();
-            exception.ShouldBeType<ArgumentException>();
-            exception.Message.ShouldEqual("Tag Name cannot start with “ ”.");
-        }
-
-        [Fact]
-        public void when_creating_xpath_tagName_starting_with_colon()
-        {
-            var exception = Record.Exception(() => XPathBuilder.GetTagNamePart(":div"));
-
-            exception.ShouldNotBeNull();
-            exception.ShouldBeType<ArgumentException>();
-            exception.Message.ShouldEqual("Tag Name prefix cannot be empty.");
-        }
-
-        [Fact]
-        public void when_creating_xpath_tagName_ending_with_colon()
-        {
-            var exception = Record.Exception(() => XPathBuilder.GetTagNamePart("div:"));
-
-            exception.ShouldNotBeNull();
-            exception.ShouldBeType<ArgumentException>();
-            exception.Message.ShouldEqual("Tag Name cannot be empty.");
-        }
-
-        [Fact]
-        public void when_creating_xpath_tagName_ending_with_space()
-        {
-            var exception = Record.Exception(() => XPathBuilder.GetTagNamePart("div "));
-
-            exception.ShouldNotBeNull();
-            exception.ShouldBeType<ArgumentException>();
-            exception.Message.ShouldEqual("Tag Name contains invalid character “ ”.");
-        }
-
-        [Fact]
-        public void when_creating_xpath_tagName_containing_tab()
-        {
-            var exception = Record.Exception(() => XPathBuilder.GetTagNamePart("di\tv"));
-
-            exception.ShouldNotBeNull();
-            exception.ShouldBeType<ArgumentException>();
-            exception.Message.ShouldEqual("Tag Name contains invalid character “\t”.");
-        }
-
-        [Fact]
-        public void when_creating_xpath_tagName_containing_quotation_mark()
-        {
-            var exception = Record.Exception(() => XPathBuilder.GetTagNamePart("div\"d\""));
-
-            exception.ShouldNotBeNull();
-            exception.ShouldBeType<ArgumentException>();
-            exception.Message.ShouldEqual("Tag Name contains invalid character “\"”.");
-        }
-
-        [Fact]
-        public void when_creating_xpath_tagName_containing_apostrophe()
-        {
-            var exception = Record.Exception(() => XPathBuilder.GetTagNamePart("john's"));
-
-            exception.ShouldNotBeNull();
-            exception.ShouldBeType<ArgumentException>();
-            exception.Message.ShouldEqual("Tag Name contains invalid character “'”.");
-        }
-
-        [Fact]
-        public void when_creating_xpath_tagName_from_single_letter()
-        {
-            var result = XPathBuilder.GetTagNamePart("a");
-            result.ShouldEqual("a");
-        }
-
-        [Fact]
-        public void when_creating_xpath_tagName_from_valid_tag_name()
-        {
-            var result = XPathBuilder.GetTagNamePart("div");
-            result.ShouldEqual("div");
-        }
-
-        [Fact]
-        public void when_creating_xpath_tagName_from_uppercase_valid_tag_name()
-        {
-            var result = XPathBuilder.GetTagNamePart("LI");
-            result.ShouldEqual("LI");
-        }
-
-        [Fact]
-        public void when_creating_xpath_tagName_from_prefixed_tag_name()
-        {
-            var result = XPathBuilder.GetTagNamePart("abc:table");
-            result.ShouldEqual("abc:table");
-        }
-
-        [Fact]
-        public void when_creating_xpath_tagName_with_colons()
-        {
-            var exception = Record.Exception(() => XPathBuilder.GetTagNamePart("abc:def:div"));
+            var exception = Record.Exception(() => XPathBuilder.GetTagNamePart(tagName));
 
             exception.ShouldNotBeNull();
             exception.ShouldBeType<FormatException>();
-            exception.Message.ShouldEqual("Tag Name cannot contain more than 1 colon.");
+            exception.Message.ShouldEqual(expectedErrorMessage);
         }
 
-        [Fact]
-        public void when_creating_xpath_tagName_with_dash()
-        {
-            var result = XPathBuilder.GetTagNamePart("book-title");
-            result.ShouldEqual("book-title");
-        }
-
-        [Fact]
-        public void when_creating_xpath_tagName_with_non_ASCII_characters()
-        {
-            var result = XPathBuilder.GetTagNamePart("书");
-            result.ShouldEqual("书");
-        }
-
-        [Fact]
-        public void when_creating_xpath_tagName_from_reserved_name()
-        {
-            var result = XPathBuilder.GetTagNamePart("text");
-            result.ShouldEqual("*[name()='text']");
-        }
+        #endregion
     }
 }
