@@ -36,6 +36,7 @@ namespace pbdq.Tests.Selenium.FX.Tests.Helpers.Validators.CssValidatorTests
         }
 
         [Theory]
+        [InlineData("", "CSS Class Name cannot be empty.")]
         [InlineData(" panel", "CSS Class Name contains invalid character “ ” at position 0.")]
         [InlineData("panel1 panel2", "CSS Class Name contains invalid character “ ” at position 6.")]
         [InlineData("panel ", "CSS Class Name contains invalid character “ ” at position 5.")]

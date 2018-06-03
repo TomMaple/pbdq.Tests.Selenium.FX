@@ -27,6 +27,9 @@ namespace pbdq.Tests.Selenium.FX.Helpers.Validators
             if (className == null)
                 throw new ArgumentNullException("CSS Class Name cannot be null.", (Exception) null);
 
+            if (className == string.Empty)
+                throw new ArgumentException("CSS Class Name cannot be empty.", (Exception) null);
+
             var regex = new Regex(IdentRegex);
             if (regex.IsMatch(className) == false)
             {
