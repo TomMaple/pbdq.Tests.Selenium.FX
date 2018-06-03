@@ -2,13 +2,16 @@
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using pbdq.Tests.Selenium.FX.Helpers.Validators;
 
 [assembly: InternalsVisibleTo("Selenium.FX.Tests")]
 
 namespace pbdq.Tests.Selenium.FX.Helpers
 {
-    internal class XPathBuilder
+    internal static class XPathBuilder
     {
+        private static readonly Exception NullException = null;
+
         internal static string GetTagNamePart(string tagName, bool isLocalName = false)
         {
             if (tagName == null)
@@ -49,6 +52,19 @@ namespace pbdq.Tests.Selenium.FX.Helpers
             }
 
             return $"[{namePart}{valuePart}]";
+        }
+
+        // from: https://devhints.io/xpath#class-check
+        internal static string GetCssClassPart(string cssClass)
+        {
+            if (cssClass == null)
+                throw new ArgumentNullException("CSS Class Name cannot be null.", NullException);
+
+            CssValidator.ValidateClassName(cssClass);
+
+            var encodedValue = EncodeAttributeValue(cssClass);
+
+            return $"[contains(concat(' ',normalize-space(@class),' '),' {encodedValue} ')]";
         }
 
         #region Encode attribute value
