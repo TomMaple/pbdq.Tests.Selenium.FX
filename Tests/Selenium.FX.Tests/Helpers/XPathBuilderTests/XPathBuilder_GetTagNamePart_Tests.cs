@@ -7,7 +7,7 @@ namespace pbdq.Tests.Selenium.FX.Tests.Helpers.XPathBuilderTests
 {
     public class XPathBuilder_GetTagNamePart_Tests
     {
-        #region valid input data
+        #region valid input data(
 
         [Theory]
         [InlineData(null, "*")]
@@ -60,12 +60,17 @@ namespace pbdq.Tests.Selenium.FX.Tests.Helpers.XPathBuilderTests
 
         [Theory]
         [InlineData("", "Tag Name cannot be empty.")]
-        [InlineData(" div", "Tag Name contains invalid character “ ”.")]
-        [InlineData("di v", "Tag Name contains invalid character “ ”.")]
-        [InlineData("div ", "Tag Name contains invalid character “ ”.")]
-        [InlineData("di\tv", "Tag Name contains invalid character “\t”.")]
-        [InlineData("di\"v", "Tag Name contains invalid character “\"”.")]
-        [InlineData("di'v", "Tag Name contains invalid character “'”.")]
+        [InlineData(" div", "Tag Name contains invalid character “ ” at position 0.")]
+        [InlineData("di v", "Tag Name contains invalid character “ ” at position 2.")]
+        [InlineData("div ", "Tag Name contains invalid character “ ” at position 3.")]
+        [InlineData("di\tv", "Tag Name contains invalid character “\t” at position 2.")]
+        [InlineData("di\"v", "Tag Name contains invalid character “\"” at position 2.")]
+        [InlineData("di'v", "Tag Name contains invalid character “'” at position 2.")]
+        [InlineData(":div", "Tag Name contains invalid character “:” at position 0.")]
+        [InlineData("div:", "Tag Name contains invalid character “:” at position 3.")]
+        [InlineData("abc::div", "Tag Name contains invalid character “:” at position 3.")]
+        [InlineData("abc:div:", "Tag Name contains invalid character “:” at position 3.")]
+        [InlineData("abc:def:div", "Tag Name contains invalid character “:” at position 3.")]
         public void when_creating_xpath_tag_with_invalid_tag_name(string tagName, string expectedErrorMessage)
         {
             var exception = Record.Exception(() => XPathBuilder.GetTagNamePart(tagName));
@@ -77,36 +82,21 @@ namespace pbdq.Tests.Selenium.FX.Tests.Helpers.XPathBuilderTests
 
         [Theory]
         [InlineData("", "Tag Name cannot be empty.")]
-        [InlineData(" div", "Tag Name contains invalid character “ ”.")]
-        [InlineData("di v", "Tag Name contains invalid character “ ”.")]
-        [InlineData("div ", "Tag Name contains invalid character “ ”.")]
-        [InlineData("di\tv", "Tag Name contains invalid character “\t”.")]
-        [InlineData("di\"v", "Tag Name contains invalid character “\"”.")]
-        [InlineData("di'v", "Tag Name contains invalid character “'”.")]
-        [InlineData(":div", "Tag Name contains invalid character “:”.")]
-        [InlineData("di:v", "Tag Name contains invalid character “:”.")]
-        [InlineData("div:", "Tag Name contains invalid character “:”.")]
+        [InlineData(" div", "Tag Name contains invalid character “ ” at position 0.")]
+        [InlineData("di v", "Tag Name contains invalid character “ ” at position 2.")]
+        [InlineData("div ", "Tag Name contains invalid character “ ” at position 3.")]
+        [InlineData("di\tv", "Tag Name contains invalid character “\t” at position 2.")]
+        [InlineData("di\"v", "Tag Name contains invalid character “\"” at position 2.")]
+        [InlineData("di'v", "Tag Name contains invalid character “'” at position 2.")]
+        [InlineData(":div", "Tag Name contains invalid character “:” at position 0.")]
+        [InlineData("di:v", "Tag Name contains invalid character “:” at position 2.")]
+        [InlineData("div:", "Tag Name contains invalid character “:” at position 3.")]
         public void when_creating_xpath_local_tag_with_invalid_tag_name(string tagName, string expectedErrorMessage)
         {
             var exception = Record.Exception(() => XPathBuilder.GetTagNamePart(tagName, isLocalName: true));
 
             exception.ShouldNotBeNull();
             exception.ShouldBeType<ArgumentException>();
-            exception.Message.ShouldEqual(expectedErrorMessage);
-        }
-
-        [Theory]
-        [InlineData(":div", "Tag Name prefix cannot be empty.")]
-        [InlineData("div:", "Tag Name cannot be empty.")]
-        [InlineData("abc::div", "Tag Name cannot contain more than 1 colon.")]
-        [InlineData("abc:div:", "Tag Name cannot contain more than 1 colon.")]
-        [InlineData("abc:def:div", "Tag Name cannot contain more than 1 colon.")]
-        public void when_creating_xpath_tag_with_invalid_format(string tagName, string expectedErrorMessage)
-        {
-            var exception = Record.Exception(() => XPathBuilder.GetTagNamePart(tagName));
-
-            exception.ShouldNotBeNull();
-            exception.ShouldBeType<FormatException>();
             exception.Message.ShouldEqual(expectedErrorMessage);
         }
 
