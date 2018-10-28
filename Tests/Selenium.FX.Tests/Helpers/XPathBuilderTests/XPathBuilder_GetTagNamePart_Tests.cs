@@ -68,8 +68,8 @@ namespace pbdq.Tests.Selenium.FX.Tests.Helpers.XPathBuilderTests
         [InlineData(":div", "Tag Name contains invalid character “:” at position 0.")]
         [InlineData("div:", "Tag Name contains invalid character “:” at position 3.")]
         [InlineData("abc::div", "Tag Name contains invalid character “:” at position 3.")]
-        [InlineData("abc:div:", "Tag Name contains invalid character “:” at position 3.")]
-        [InlineData("abc:def:div", "Tag Name contains invalid character “:” at position 3.")]
+        [InlineData("abc:div:", "Tag Name contains invalid character “:” at position 7.")]
+        [InlineData("abc:def:div", "Tag Name contains invalid character “:” at position 7.")]
         public void when_creating_xpath_tag_with_invalid_tag_name(string tagName, string expectedErrorMessage)
         {
             var exception = Should.Throw<ArgumentException>(() => XPathBuilder.GetTagNamePart(tagName));

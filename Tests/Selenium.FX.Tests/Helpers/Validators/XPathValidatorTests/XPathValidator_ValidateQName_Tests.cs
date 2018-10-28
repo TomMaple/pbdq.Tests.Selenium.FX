@@ -49,8 +49,8 @@ namespace pbdq.Tests.Selenium.FX.Tests.Helpers.Validators.XPathValidatorTests
         [InlineData(":div", "Tag Name contains invalid character “:” at position 0.")]
         [InlineData("div:", "Tag Name contains invalid character “:” at position 3.")]
         [InlineData("abc::div", "Tag Name contains invalid character “:” at position 3.")]
-        [InlineData("abc:div:", "Tag Name contains invalid character “:” at position 3.")]
-        [InlineData("abc:def:div", "Tag Name contains invalid character “:” at position 3.")]
+        [InlineData("abc:div:", "Tag Name contains invalid character “:” at position 7.")]
+        [InlineData("abc:def:div", "Tag Name contains invalid character “:” at position 7.")]
         public void when_validating_qName_with_invalid_values(string qName, string expectedErrorMessage)
         {
             var exception = Should.Throw<ArgumentException>(() => XPathValidator.ValidateQName(qName, "Tag Name"));

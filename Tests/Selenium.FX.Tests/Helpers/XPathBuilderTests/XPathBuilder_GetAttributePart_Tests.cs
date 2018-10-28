@@ -62,9 +62,9 @@ namespace pbdq.Tests.Selenium.FX.Tests.Helpers.XPathBuilderTests
         [Theory]
         [InlineData(":abc", "Attribute Name contains invalid character “:” at position 0.")]
         [InlineData("abc:", "Attribute Name contains invalid character “:” at position 3.")]
-        [InlineData("abc:def:", "Attribute Name contains invalid character “:” at position 3.")]
+        [InlineData("abc:def:", "Attribute Name contains invalid character “:” at position 7.")]
         [InlineData("abc::def", "Attribute Name contains invalid character “:” at position 3.")]
-        [InlineData("abc:def:div", "Attribute Name contains invalid character “:” at position 3.")]
+        [InlineData("abc:def:div", "Attribute Name contains invalid character “:” at position 7.")]
         public void when_creating_xpath_attribute_with_invalid_format(string name, string expectedErrorMessage)
         {
             var exception = Should.Throw<ArgumentException>(() => XPathBuilder.GetAttributePart(name, null));

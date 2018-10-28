@@ -7,7 +7,7 @@ namespace pbdq.Tests.Selenium.FX.Helpers.Validators
     {
         // TODO: update to add UTF-32 characters
         // private static readonly string NonAsciiRegex = "[\u0080-\uD7FF\uE000-\uFFFD\U00010000-\U0010FFFF]";
-        // private static readonly string escapeRegex = $"{unicodeRegex}|\\\\[\u0020-\u007E\u0080-\uD7FF\uE000-\uFFFD\U00010000-\U0010FFFF]";
+        // private static readonly string EscapeRegex = $"{unicodeRegex}|\\\\[\u0020-\u007E\u0080-\uD7FF\uE000-\uFFFD\U00010000-\U0010FFFF]";
 
         private static readonly string NonAsciiRegex = "[\u0080-\uD7FF\uE000-\uFFFD]";
         private static readonly string UnicodeRegex = "\\[0-9a-fA-F]{1,6}[\t\n\f\r ]?";
@@ -57,10 +57,11 @@ namespace pbdq.Tests.Selenium.FX.Helpers.Validators
         private static void ValidateCharacters(string className)
         {
             var regex = new Regex(IdentRegex);
+            var maxLength = className.Length;
 
-            for (var idx = 1; idx < className.Length; idx++)
-                if (regex.IsMatch(className.Substring(0, idx + 1)) == false)
-                    throw new ArgumentException($"CSS Class Name contains invalid character “{className[idx]}” at position {idx}.");
+            for (var length = maxLength; length > 0; length--)
+                if (regex.IsMatch(className.Substring(0, length)) && length < maxLength)
+                    throw new ArgumentException($"CSS Class Name contains invalid character “{className[length]}” at position {length}.");
         }
     }
 }
