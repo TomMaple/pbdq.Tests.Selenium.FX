@@ -66,6 +66,18 @@ namespace pbdq.Tests.Selenium.FX.Helpers
             return $"[contains(concat(' ',normalize-space(@class),' '),' {encodedValue} ')]";
         }
 
+        internal static string GetTextPart(string text, bool isPartial = false)
+        {
+            if (text == null)
+                return "[text()]";
+
+            var encodedText = EncodeAttributeValue(text);
+
+            return isPartial
+                ? $"[contains(text(),'{encodedText}')]"
+                : $"[text()='{encodedText}']";
+        }
+
         #region Encode attribute value
 
         // TODO: update according to https://referencesource.microsoft.com/#System.Xml/System/Xml/Core/XmlTextEncoder.cs : Write() (for full support of Unicode)
