@@ -42,13 +42,13 @@ namespace pbdq.Tests.Selenium.FX.Tests.Helpers.XPathBuilderTests
 
         [Theory]
         [InlineData("", "Attribute Name cannot be empty.")]
-        [InlineData(" lang", "Attribute Name contains invalid character “ ”.")]
-        [InlineData("l ang", "Attribute Name contains invalid character “ ”.")]
-        [InlineData("l\tang", "Attribute Name contains invalid character “\t”.")]
-        [InlineData("lang ", "Attribute Name contains invalid character “ ”.")]
-        [InlineData("l'ang", "Attribute Name contains invalid character “'”.")]
-        [InlineData("l\"ang", "Attribute Name contains invalid character “\"”.")]
-        [InlineData("*", "Attribute Name contains invalid character “*”.")]
+        [InlineData(" lang", "Attribute Name contains invalid character “ ” at position 0.")]
+        [InlineData("l ang", "Attribute Name contains invalid character “ ” at position 1.")]
+        [InlineData("l\tang", "Attribute Name contains invalid character “\t” at position 1.")]
+        [InlineData("lang ", "Attribute Name contains invalid character “ ” at position 4.")]
+        [InlineData("l'ang", "Attribute Name contains invalid character “'” at position 1.")]
+        [InlineData("l\"ang", "Attribute Name contains invalid character “\"” at position 1.")]
+        [InlineData("*", "Attribute Name contains invalid character “*” at position 0.")]
         [InlineData("1lang", "Attribute Name cannot start with “1”.")]
         [InlineData("-lang", "Attribute Name cannot start with “-”.")]
         public void when_creating_xpath_attribute_with_invalid_attibute_name(string name, string expectedErrorMessage)
@@ -61,11 +61,11 @@ namespace pbdq.Tests.Selenium.FX.Tests.Helpers.XPathBuilderTests
         }
 
         [Theory]
-        [InlineData(":abc", "Attribute Name prefix cannot be empty.")]
-        [InlineData("abc:", "Attribute Name cannot be empty.")]
-        [InlineData("abc:def:", "Attribute Name cannot contain more than 1 colon.")]
-        [InlineData("abc::def", "Attribute Name cannot contain more than 1 colon.")]
-        [InlineData("abc:def:div", "Attribute Name cannot contain more than 1 colon.")]
+        [InlineData(":abc", "Attribute Name contains invalid character “:” at position 0.")]
+        [InlineData("abc:", "Attribute Name contains invalid character “:” at position 3.")]
+        [InlineData("abc:def:", "Attribute Name contains invalid character “:” at position 3.")]
+        [InlineData("abc::def", "Attribute Name contains invalid character “:” at position 3.")]
+        [InlineData("abc:def:div", "Attribute Name contains invalid character “:” at position 3.")]
         public void when_creating_xpath_attribute_with_invalid_format(string name, string expectedErrorMessage)
         {
             var exception = Record.Exception(() => XPathBuilder.GetAttributePart(name, null));
