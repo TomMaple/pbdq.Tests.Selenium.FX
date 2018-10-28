@@ -43,7 +43,7 @@ namespace pbdq.Tests.Selenium.FX.Helpers.Validators
                 ValidateFirstCharacter(qName[0], elementTypeName);
                 ValidateQCharacters(qName, elementTypeName);
 
-                throw new NotImplementedException($"{elementTypeName} is invalid.");
+                throw new ArgumentException($"{elementTypeName} contains invalid character “{qName[1]}” at position 1.");
             }
         }
 
@@ -61,7 +61,7 @@ namespace pbdq.Tests.Selenium.FX.Helpers.Validators
                 ValidateFirstCharacter(ncName[0], elementTypeName);
                 ValidateNcCharacters(ncName, elementTypeName);
 
-                throw new NotImplementedException($"{elementTypeName} is invalid.");
+                throw new ArgumentException($"{elementTypeName} contains invalid character “{ncName[1]}” at position 1.");
             }
         }
 

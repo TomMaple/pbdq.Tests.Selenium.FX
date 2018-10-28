@@ -36,7 +36,7 @@ namespace pbdq.Tests.Selenium.FX.Helpers.Validators
                 ValidateFirstCharacter(className[0]);
                 ValidateCharacters(className);
 
-                throw new ArgumentException("Invalid CSS class name.");
+                throw new ArgumentException($"CSS Class Name contains invalid character “{className[1]}” at position 1.");
             }
         }
 
