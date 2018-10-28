@@ -1,8 +1,7 @@
 ﻿using System;
 using pbdq.Tests.Selenium.FX.Helpers.Validators;
-using Should;
+using Shouldly;
 using Xunit;
-using Record = Should.Core.Assertions.Record;
 
 namespace pbdq.Tests.Selenium.FX.Tests.Helpers.Validators.XPathValidatorTests
 {
@@ -23,17 +22,15 @@ namespace pbdq.Tests.Selenium.FX.Tests.Helpers.Validators.XPathValidatorTests
         [InlineData("书")]
         public void when_validating_qName_with_valid_values(string qName)
         {
-            var exception = Record.Exception(() => XPathValidator.ValidateQName(qName, "Element"));
-            exception.ShouldBeNull();
+            Should.NotThrow(() => XPathValidator.ValidateQName(qName, "Element"));
         }
 
         [Fact]
         public void when_validating_qName_with_null_value()
         {
-            var exception = Record.Exception(() => XPathValidator.ValidateQName(null, "Element"));
+            var exception = Should.Throw<ArgumentNullException>(() => XPathValidator.ValidateQName(null, "Element"));
             exception.ShouldNotBeNull();
-            exception.ShouldBeType<ArgumentNullException>();
-            exception.Message.ShouldEqual("Element cannot be null.");
+            exception.Message.ShouldBe("Element cannot be null.");
         }
 
         [Theory]
@@ -56,10 +53,9 @@ namespace pbdq.Tests.Selenium.FX.Tests.Helpers.Validators.XPathValidatorTests
         [InlineData("abc:def:div", "Tag Name contains invalid character “:” at position 3.")]
         public void when_validating_qName_with_invalid_values(string qName, string expectedErrorMessage)
         {
-            var exception = Record.Exception(() => XPathValidator.ValidateQName(qName, "Tag Name"));
+            var exception = Should.Throw<ArgumentException>(() => XPathValidator.ValidateQName(qName, "Tag Name"));
             exception.ShouldNotBeNull();
-            exception.ShouldBeType<ArgumentException>();
-            exception.Message.ShouldEqual(expectedErrorMessage);
+            exception.Message.ShouldBe(expectedErrorMessage);
         }
     }
 }

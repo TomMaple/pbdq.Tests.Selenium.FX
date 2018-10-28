@@ -1,6 +1,6 @@
 ﻿using System;
 using pbdq.Tests.Selenium.FX.Helpers;
-using Should;
+using Shouldly;
 using Xunit;
 
 namespace pbdq.Tests.Selenium.FX.Tests.Helpers.XPathBuilderTests
@@ -20,7 +20,7 @@ namespace pbdq.Tests.Selenium.FX.Tests.Helpers.XPathBuilderTests
         public void when_creating_xpath_tag_with_valid_values(string tagName, string expectedResult)
         {
             var result = XPathBuilder.GetTagNamePart(tagName);
-            result.ShouldEqual(expectedResult);
+            result.ShouldBe(expectedResult);
         }
 
         [Theory]
@@ -32,7 +32,7 @@ namespace pbdq.Tests.Selenium.FX.Tests.Helpers.XPathBuilderTests
         public void when_creating_xpath_local_tag_with_valid_values(string tagName, string expectedResult)
         {
             var result = XPathBuilder.GetTagNamePart(tagName, isLocalName: true);
-            result.ShouldEqual(expectedResult);
+            result.ShouldBe(expectedResult);
         }
 
         [Theory]
@@ -41,7 +41,7 @@ namespace pbdq.Tests.Selenium.FX.Tests.Helpers.XPathBuilderTests
         public void when_creating_xpath_tag_with_reserved_names(string tagName, bool isLocalName, string expectedResult)
         {
             var result = XPathBuilder.GetTagNamePart(tagName, isLocalName);
-            result.ShouldEqual(expectedResult);
+            result.ShouldBe(expectedResult);
         }
 
         #endregion
@@ -51,11 +51,10 @@ namespace pbdq.Tests.Selenium.FX.Tests.Helpers.XPathBuilderTests
         [Fact]
         public void when_creating_xpath_local_tag_with_null_value()
         {
-            var exception = Record.Exception(() => XPathBuilder.GetTagNamePart(null, isLocalName: true));
+            var exception = Should.Throw<ArgumentNullException>(() => XPathBuilder.GetTagNamePart(null, isLocalName: true));
 
             exception.ShouldNotBeNull();
-            exception.ShouldBeType<ArgumentNullException>();
-            exception.Message.ShouldEqual("Tag Name cannot be null.");
+            exception.Message.ShouldBe("Tag Name cannot be null.");
         }
 
         [Theory]
@@ -73,11 +72,10 @@ namespace pbdq.Tests.Selenium.FX.Tests.Helpers.XPathBuilderTests
         [InlineData("abc:def:div", "Tag Name contains invalid character “:” at position 3.")]
         public void when_creating_xpath_tag_with_invalid_tag_name(string tagName, string expectedErrorMessage)
         {
-            var exception = Record.Exception(() => XPathBuilder.GetTagNamePart(tagName));
+            var exception = Should.Throw<ArgumentException>(() => XPathBuilder.GetTagNamePart(tagName));
 
             exception.ShouldNotBeNull();
-            exception.ShouldBeType<ArgumentException>();
-            exception.Message.ShouldEqual(expectedErrorMessage);
+            exception.Message.ShouldBe(expectedErrorMessage);
         }
 
         [Theory]
@@ -93,11 +91,10 @@ namespace pbdq.Tests.Selenium.FX.Tests.Helpers.XPathBuilderTests
         [InlineData("div:", "Tag Name contains invalid character “:” at position 3.")]
         public void when_creating_xpath_local_tag_with_invalid_tag_name(string tagName, string expectedErrorMessage)
         {
-            var exception = Record.Exception(() => XPathBuilder.GetTagNamePart(tagName, isLocalName: true));
+            var exception = Should.Throw<ArgumentException>(() => XPathBuilder.GetTagNamePart(tagName, isLocalName: true));
 
             exception.ShouldNotBeNull();
-            exception.ShouldBeType<ArgumentException>();
-            exception.Message.ShouldEqual(expectedErrorMessage);
+            exception.Message.ShouldBe(expectedErrorMessage);
         }
 
         #endregion

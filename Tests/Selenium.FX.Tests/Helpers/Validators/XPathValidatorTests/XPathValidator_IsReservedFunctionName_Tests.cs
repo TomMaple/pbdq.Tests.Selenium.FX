@@ -1,6 +1,6 @@
 ﻿using System;
 using pbdq.Tests.Selenium.FX.Helpers.Validators;
-using Should;
+using Shouldly;
 using Xunit;
 
 namespace pbdq.Tests.Selenium.FX.Tests.Helpers.Validators.XPathValidatorTests
@@ -21,10 +21,9 @@ namespace pbdq.Tests.Selenium.FX.Tests.Helpers.Validators.XPathValidatorTests
         [Fact]
         public void when_validating_null_if_is_reserved_function_name()
         {
-            var exception = Record.Exception(() => XPathValidator.IsReservedFunctionName(null));
+            var exception = Should.Throw<ArgumentNullException>(() => XPathValidator.IsReservedFunctionName(null));
 
             exception.ShouldNotBeNull();
-            exception.ShouldBeType<ArgumentNullException>();
             exception.Message.ShouldStartWith("Name cannot be null!");
         }
 

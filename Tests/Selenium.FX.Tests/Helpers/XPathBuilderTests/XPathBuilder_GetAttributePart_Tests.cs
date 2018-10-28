@@ -1,6 +1,6 @@
 ﻿using System;
 using pbdq.Tests.Selenium.FX.Helpers;
-using Should;
+using Shouldly;
 using Xunit;
 
 namespace pbdq.Tests.Selenium.FX.Tests.Helpers.XPathBuilderTests
@@ -25,7 +25,7 @@ namespace pbdq.Tests.Selenium.FX.Tests.Helpers.XPathBuilderTests
         public void when_creating_xpath_attribute_with_valid_values(string attributeName, string attributeValue, string expectedResult)
         {
             var result = XPathBuilder.GetAttributePart(attributeName, attributeValue);
-            result.ShouldEqual(expectedResult);
+            result.ShouldBe(expectedResult);
         }
 
         [Theory]
@@ -33,7 +33,7 @@ namespace pbdq.Tests.Selenium.FX.Tests.Helpers.XPathBuilderTests
         public void when_creating_xpath_attribute_with_reserved_names(string attributeName, string attributeValue, string expectedResult)
         {
             var result = XPathBuilder.GetAttributePart(attributeName, attributeValue);
-            result.ShouldEqual(expectedResult);
+            result.ShouldBe(expectedResult);
         }
 
         #endregion
@@ -53,11 +53,10 @@ namespace pbdq.Tests.Selenium.FX.Tests.Helpers.XPathBuilderTests
         [InlineData("-lang", "Attribute Name cannot start with “-”.")]
         public void when_creating_xpath_attribute_with_invalid_attibute_name(string name, string expectedErrorMessage)
         {
-            var exception = Record.Exception(() => XPathBuilder.GetAttributePart(name, null));
+            var exception = Should.Throw<ArgumentException>(() => XPathBuilder.GetAttributePart(name, null));
 
             exception.ShouldNotBeNull();
-            exception.ShouldBeType<ArgumentException>();
-            exception.Message.ShouldEqual(expectedErrorMessage);
+            exception.Message.ShouldBe(expectedErrorMessage);
         }
 
         [Theory]
@@ -68,11 +67,10 @@ namespace pbdq.Tests.Selenium.FX.Tests.Helpers.XPathBuilderTests
         [InlineData("abc:def:div", "Attribute Name contains invalid character “:” at position 3.")]
         public void when_creating_xpath_attribute_with_invalid_format(string name, string expectedErrorMessage)
         {
-            var exception = Record.Exception(() => XPathBuilder.GetAttributePart(name, null));
+            var exception = Should.Throw<ArgumentException>(() => XPathBuilder.GetAttributePart(name, null));
 
             exception.ShouldNotBeNull();
-            exception.ShouldBeType<FormatException>();
-            exception.Message.ShouldEqual(expectedErrorMessage);
+            exception.Message.ShouldBe(expectedErrorMessage);
         }
         
         #endregion

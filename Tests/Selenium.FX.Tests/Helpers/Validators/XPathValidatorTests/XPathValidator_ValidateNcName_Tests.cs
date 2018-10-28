@@ -1,8 +1,7 @@
 ﻿using System;
 using pbdq.Tests.Selenium.FX.Helpers.Validators;
-using Should;
+using Shouldly;
 using Xunit;
-using Record = Should.Core.Assertions.Record;
 
 namespace pbdq.Tests.Selenium.FX.Tests.Helpers.Validators.XPathValidatorTests
 {
@@ -22,17 +21,15 @@ namespace pbdq.Tests.Selenium.FX.Tests.Helpers.Validators.XPathValidatorTests
         [InlineData("书")]
         public void when_validating_qName_with_valid_values(string qName)
         {
-            var exception = Record.Exception(() => XPathValidator.ValidateNCName(qName, "Tag Name"));
-            exception.ShouldBeNull();
+            Should.NotThrow(() => XPathValidator.ValidateNCName(qName, "Tag Name"));
         }
 
         [Fact]
         public void when_validating_qName_with_null_value()
         {
-            var exception = Record.Exception(() => XPathValidator.ValidateNCName(null, "Tag Name"));
+            var exception = Should.Throw<ArgumentNullException>(() => XPathValidator.ValidateNCName(null, "Tag Name"));
             exception.ShouldNotBeNull();
-            exception.ShouldBeType<ArgumentNullException>();
-            exception.Message.ShouldEqual("Tag Name cannot be null.");
+            exception.Message.ShouldBe("Tag Name cannot be null.");
         }
 
         [Theory]
@@ -56,10 +53,9 @@ namespace pbdq.Tests.Selenium.FX.Tests.Helpers.Validators.XPathValidatorTests
         [InlineData("abc:def:div", "Tag Name contains invalid character “:” at position 3.")]
         public void when_validating_qName_with_invalid_values(string qName, string expectedErrorMessage)
         {
-            var exception = Record.Exception(() => XPathValidator.ValidateNCName(qName, "Tag Name"));
+            var exception = Should.Throw<ArgumentException>(() => XPathValidator.ValidateNCName(qName, "Tag Name"));
             exception.ShouldNotBeNull();
-            exception.ShouldBeType<ArgumentException>();
-            exception.Message.ShouldEqual(expectedErrorMessage);
+            exception.Message.ShouldBe(expectedErrorMessage);
         }
     }
 }

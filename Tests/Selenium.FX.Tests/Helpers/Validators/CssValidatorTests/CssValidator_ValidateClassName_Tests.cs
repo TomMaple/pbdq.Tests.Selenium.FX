@@ -1,6 +1,6 @@
 ﻿using System;
 using pbdq.Tests.Selenium.FX.Helpers.Validators;
-using Should;
+using Shouldly;
 using Xunit;
 
 namespace pbdq.Tests.Selenium.FX.Tests.Helpers.Validators.CssValidatorTests
@@ -21,18 +21,16 @@ namespace pbdq.Tests.Selenium.FX.Tests.Helpers.Validators.CssValidatorTests
         [InlineData("书")]
         public void when_creating_xpath_css_class_with_valid_values(string cssClass)
         {
-            var exception = Record.Exception(() => CssValidator.ValidateClassName(cssClass));
-            exception.ShouldBeNull();
+            Should.NotThrow(() => CssValidator.ValidateClassName(cssClass));
         }
 
         [Fact]
         public void when_validating_class_name_with_null_value()
         {
-            var exception = Record.Exception(() => CssValidator.ValidateClassName(null));
+            var exception = Should.Throw<ArgumentNullException>(() => CssValidator.ValidateClassName(null));
 
             exception.ShouldNotBeNull();
-            exception.ShouldBeType<ArgumentNullException>();
-            exception.Message.ShouldEqual("CSS Class Name cannot be null.");
+            exception.Message.ShouldStartWith("CSS Class Name cannot be null.");
         }
 
         [Theory]
@@ -48,11 +46,10 @@ namespace pbdq.Tests.Selenium.FX.Tests.Helpers.Validators.CssValidatorTests
         [InlineData("-9", "CSS Class Name contains invalid character “9” at position 1.")]
         public void when_validating_class_name_with_invalid_value(string className, string expectedErrorMessage)
         {
-            var exception = Record.Exception(() => CssValidator.ValidateClassName(className));
+            var exception = Should.Throw<ArgumentException>(() => CssValidator.ValidateClassName(className));
 
             exception.ShouldNotBeNull();
-            exception.ShouldBeType<ArgumentException>();
-            exception.Message.ShouldEqual(expectedErrorMessage);
+            exception.Message.ShouldBe(expectedErrorMessage);
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using System;
 using pbdq.Tests.Selenium.FX.Helpers;
-using Should;
+using Shouldly;
 using Xunit;
 
 namespace pbdq.Tests.Selenium.FX.Tests.Helpers.XPathBuilderTests
@@ -17,27 +17,25 @@ namespace pbdq.Tests.Selenium.FX.Tests.Helpers.XPathBuilderTests
         public void when_creating_xpath_css_class_with_valid_values(string cssClass, string expectedResult)
         {
             var result = XPathBuilder.GetCssClassPart(cssClass);
-            result.ShouldEqual(expectedResult);
+            result.ShouldBe(expectedResult);
         }
 
         [Fact]
         public void when_creating_xpath_css_class_with_null_value()
         {
-            var exception = Record.Exception(() => XPathBuilder.GetCssClassPart(null));
+            var exception = Should.Throw<ArgumentNullException>(() => XPathBuilder.GetCssClassPart(null));
 
             exception.ShouldNotBeNull();
-            exception.ShouldBeType<ArgumentNullException>();
-            exception.Message.ShouldEqual("CSS Class Name cannot be null.");
+            exception.Message.ShouldBe("CSS Class Name cannot be null.");
         }
 
         [Fact]
         public void when_creating_xpath_css_class_with_invalid_value()
         {
-            var exception = Record.Exception(() => XPathBuilder.GetCssClassPart(" invalid value "));
+            var exception = Should.Throw<ArgumentException>(() => XPathBuilder.GetCssClassPart(" invalid value "));
 
             exception.ShouldNotBeNull();
-            exception.ShouldBeType<ArgumentException>();
-            exception.Message.ShouldEqual("CSS Class Name contains invalid character “ ” at position 0.");
+            exception.Message.ShouldBe("CSS Class Name contains invalid character “ ” at position 0.");
         }
     }
 }
