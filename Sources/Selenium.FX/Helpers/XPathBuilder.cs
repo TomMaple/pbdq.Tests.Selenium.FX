@@ -10,6 +10,7 @@ namespace pbdq.Tests.Selenium.FX.Helpers
     internal static class XPathBuilder
     {
         private static readonly Exception NullException = null;
+        private static CssValidator _cssValidator = new CssValidator();
 
         internal static string GetTagNamePart(string tagName, bool isLocalName = false)
         {
@@ -59,7 +60,7 @@ namespace pbdq.Tests.Selenium.FX.Helpers
             if (cssClass == null)
                 throw new ArgumentNullException("CSS Class Name cannot be null.", NullException);
 
-            CssValidator.ValidateClassName(cssClass);
+            _cssValidator.ValidateClassName(cssClass);
 
             var encodedValue = EncodeAttributeValue(cssClass);
 

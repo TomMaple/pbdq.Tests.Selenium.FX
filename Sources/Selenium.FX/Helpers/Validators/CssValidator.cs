@@ -3,7 +3,12 @@ using System.Text.RegularExpressions;
 
 namespace pbdq.Tests.Selenium.FX.Helpers.Validators
 {
-    internal static class CssValidator
+    internal interface ICssValidator
+    {
+        void ValidateClassName(string className);
+    }
+
+    internal class CssValidator : ICssValidator
     {
         // TODO: update to add UTF-32 characters
         // private static readonly string NonAsciiRegex = "[\u0080-\uD7FF\uE000-\uFFFD\U00010000-\U0010FFFF]";
@@ -22,7 +27,7 @@ namespace pbdq.Tests.Selenium.FX.Helpers.Validators
         ///     https://www.w3.org/TR/css-syntax-3/#typedef-ident-token
         ///     https://github.com/gorilla/css/blob/master/scanner/scanner.go
         /// </remarks>
-        internal static void ValidateClassName(string className)
+        public void ValidateClassName(string className)
         {
             if (className == null)
                 throw new ArgumentNullException("CSS Class Name cannot be null.", (Exception) null);
