@@ -7,6 +7,13 @@ namespace pbdq.Tests.Selenium.FX.Tests.Helpers.Validators.XPathValidatorTests
 {
     public class XPathValidator_IsReservedFunctionName_Tests
     {
+        private readonly XPathValidator _validator;
+
+        public XPathValidator_IsReservedFunctionName_Tests()
+        {
+            _validator = new XPathValidator();
+        }
+
         [Theory]
         [InlineData("abc")]
         [InlineData("a4")]
@@ -14,14 +21,14 @@ namespace pbdq.Tests.Selenium.FX.Tests.Helpers.Validators.XPathValidatorTests
         [InlineData("AaA")]
         public void when_validating_if_is_reserved_function_name_with_valid_values(string name)
         {
-            var result = XPathValidator.IsReservedFunctionName(name);
+            var result = _validator.IsReservedFunctionName(name);
             result.ShouldBeFalse();
         }
 
         [Fact]
         public void when_validating_null_if_is_reserved_function_name()
         {
-            var exception = Should.Throw<ArgumentNullException>(() => XPathValidator.IsReservedFunctionName(null));
+            var exception = Should.Throw<ArgumentNullException>(() => _validator.IsReservedFunctionName(null));
 
             exception.ShouldNotBeNull();
             exception.Message.ShouldStartWith("Name cannot be null!");
@@ -44,7 +51,7 @@ namespace pbdq.Tests.Selenium.FX.Tests.Helpers.Validators.XPathValidatorTests
         [InlineData("ATTRIBUTE")]
         public void when_validating_if_is_reserved_function_name_with_invalid_values(string name)
         {
-            var result = XPathValidator.IsReservedFunctionName(name);
+            var result = _validator.IsReservedFunctionName(name);
             result.ShouldBeTrue();
         }
     }

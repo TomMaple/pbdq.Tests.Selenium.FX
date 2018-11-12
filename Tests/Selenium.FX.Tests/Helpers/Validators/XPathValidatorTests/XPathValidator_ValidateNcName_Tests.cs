@@ -7,6 +7,13 @@ namespace pbdq.Tests.Selenium.FX.Tests.Helpers.Validators.XPathValidatorTests
 {
     public class XPathValidator_ValidateNcName_Tests
     {
+        private readonly XPathValidator _validator;
+
+        public XPathValidator_ValidateNcName_Tests()
+        {
+            _validator = new XPathValidator();
+        }
+
         [Theory]
         [InlineData("a")]
         [InlineData("LI")]
@@ -21,13 +28,13 @@ namespace pbdq.Tests.Selenium.FX.Tests.Helpers.Validators.XPathValidatorTests
         [InlineData("书")]
         public void when_validating_qName_with_valid_values(string qName)
         {
-            Should.NotThrow(() => XPathValidator.ValidateNCName(qName, "Tag Name"));
+            Should.NotThrow(() => _validator.ValidateNCName(qName, "Tag Name"));
         }
 
         [Fact]
         public void when_validating_qName_with_null_value()
         {
-            var exception = Should.Throw<ArgumentNullException>(() => XPathValidator.ValidateNCName(null, "Tag Name"));
+            var exception = Should.Throw<ArgumentNullException>(() => _validator.ValidateNCName(null, "Tag Name"));
             exception.ShouldNotBeNull();
             exception.Message.ShouldBe("Tag Name cannot be null.");
         }
@@ -53,7 +60,7 @@ namespace pbdq.Tests.Selenium.FX.Tests.Helpers.Validators.XPathValidatorTests
         [InlineData("abc:def:div", "Tag Name contains invalid character “:” at position 3.")]
         public void when_validating_qName_with_invalid_values(string qName, string expectedErrorMessage)
         {
-            var exception = Should.Throw<ArgumentException>(() => XPathValidator.ValidateNCName(qName, "Tag Name"));
+            var exception = Should.Throw<ArgumentException>(() => _validator.ValidateNCName(qName, "Tag Name"));
             exception.ShouldNotBeNull();
             exception.Message.ShouldBe(expectedErrorMessage);
         }

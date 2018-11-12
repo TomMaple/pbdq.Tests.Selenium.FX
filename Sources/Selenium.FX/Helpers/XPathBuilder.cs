@@ -10,7 +10,8 @@ namespace pbdq.Tests.Selenium.FX.Helpers
     internal static class XPathBuilder
     {
         private static readonly Exception NullException = null;
-        private static CssValidator _cssValidator = new CssValidator();
+        private static ICssValidator _cssValidator = new CssValidator();
+        private static IXPathValidator _xPathValidator = new XPathValidator();
 
         internal static string GetTagNamePart(string tagName, bool isLocalName = false)
         {
@@ -22,14 +23,14 @@ namespace pbdq.Tests.Selenium.FX.Helpers
             }
 
             if (isLocalName)
-                XPathValidator.ValidateNCName(tagName, "Tag Name");
+                _xPathValidator.ValidateNCName(tagName, "Tag Name");
             else
-                XPathValidator.ValidateQName(tagName, "Tag Name");
+                _xPathValidator.ValidateQName(tagName, "Tag Name");
 
             if (isLocalName)
                 return $"*[local-name()='{tagName}']";
 
-            if (XPathValidator.IsReservedFunctionName(tagName))
+            if (_xPathValidator.IsReservedFunctionName(tagName))
                 return $"*[name()='{tagName}']";
 
             return tagName;
@@ -38,7 +39,7 @@ namespace pbdq.Tests.Selenium.FX.Helpers
         internal static string GetAttributePart(string attributeName, string attributeValue)
         {
             if (attributeName != null)
-                XPathValidator.ValidateQName(attributeName, "Attribute Name");
+                _xPathValidator.ValidateQName(attributeName, "Attribute Name");
 
             var namePart = attributeName != null
                 ? $"@{attributeName}"

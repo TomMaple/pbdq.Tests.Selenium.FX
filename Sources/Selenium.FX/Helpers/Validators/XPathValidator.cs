@@ -4,7 +4,14 @@ using System.Text.RegularExpressions;
 
 namespace pbdq.Tests.Selenium.FX.Helpers.Validators
 {
-    internal static class XPathValidator
+    internal interface IXPathValidator
+    {
+        void ValidateQName(string qName, string elementTypeName);
+        void ValidateNCName(string ncName, string elementTypeName);
+        bool IsReservedFunctionName(string name);
+    }
+
+    internal class XPathValidator : IXPathValidator
     {
         private static readonly Exception NullException = null;
 
@@ -29,7 +36,7 @@ namespace pbdq.Tests.Selenium.FX.Helpers.Validators
         /// <remarks>Based on:
         /// https://www.w3.org/TR/REC-xml-names/#NT-QName
         /// </remarks>
-        internal static void ValidateQName(string qName, string elementTypeName)
+        public void ValidateQName(string qName, string elementTypeName)
         {
             if (qName == null)
                 throw new ArgumentNullException($"{elementTypeName} cannot be null.", NullException);
@@ -47,7 +54,7 @@ namespace pbdq.Tests.Selenium.FX.Helpers.Validators
             }
         }
 
-        internal static void ValidateNCName(string ncName, string elementTypeName)
+        public void ValidateNCName(string ncName, string elementTypeName)
         {
             if (ncName == null)
                 throw new ArgumentNullException($"{elementTypeName} cannot be null.", NullException);
@@ -65,7 +72,7 @@ namespace pbdq.Tests.Selenium.FX.Helpers.Validators
             }
         }
 
-        internal static bool IsReservedFunctionName(string name)
+        public bool IsReservedFunctionName(string name)
         {
             if (name == null)
                 throw new ArgumentNullException(nameof(name), "Name cannot be null!");
