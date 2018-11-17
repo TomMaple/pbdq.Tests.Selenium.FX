@@ -1,5 +1,7 @@
 ﻿using System;
+using NSubstitute;
 using pbdq.Tests.Selenium.FX.Helpers;
+using pbdq.Tests.Selenium.FX.Helpers.Validators;
 using Shouldly;
 using Xunit;
 
@@ -7,41 +9,58 @@ namespace pbdq.Tests.Selenium.FX.Tests.Helpers.XPathBuilderTests
 {
     public class XPathBuilder_GetTagNamePart_Tests
     {
-        #region valid input data(
+        private readonly XPathBuilder _builder;
+        private readonly IXPathValidator _xPathValidator;
+        private readonly ICssValidator _cssValidator;
 
-        [Theory]
-        [InlineData(null, "*")]
-        [InlineData("a", "a")]
-        [InlineData("LI", "LI")]
-        [InlineData("div", "div")]
-        [InlineData("abc:table", "abc:table")]
-        [InlineData("book-title", "book-title")]
-        [InlineData("书", "书")]
-        public void when_creating_xpath_tag_with_valid_values(string tagName, string expectedResult)
+        public XPathBuilder_GetTagNamePart_Tests()
         {
-            var result = XPathBuilder.GetTagNamePart(tagName);
-            result.ShouldBe(expectedResult);
+            _xPathValidator = Substitute.For<IXPathValidator>();
+            _cssValidator = Substitute.For<ICssValidator>();
+            _builder = new XPathBuilder(_xPathValidator, _cssValidator);
         }
 
-        [Theory]
-        [InlineData("a", "*[local-name()='a']")]
-        [InlineData("LI", "*[local-name()='LI']")]
-        [InlineData("div", "*[local-name()='div']")]
-        [InlineData("book-title", "*[local-name()='book-title']")]
-        [InlineData("书", "*[local-name()='书']")]
-        public void when_creating_xpath_local_tag_with_valid_values(string tagName, string expectedResult)
+        #region valid input data
+
+        [Fact]
+        public void when_creating_xpath_tag_with_valid_values()
         {
-            var result = XPathBuilder.GetTagNamePart(tagName, isLocalName: true);
-            result.ShouldBe(expectedResult);
+            var result = _builder.GetTagNamePart("valid:TagName");
+            result.ShouldBe("valid:TagName");
+
+            _xPathValidator.Received(1).ValidateQName("valid:TagName", "Tag Name");
+            _xPathValidator.DidNotReceiveWithAnyArgs().ValidateNCName(Arg.Any<string>(), Arg.Any<string>());
+            _xPathValidator.Received(1).IsReservedFunctionName("valid:TagName");
+
+            _cssValidator.DidNotReceiveWithAnyArgs().ValidateClassName(Arg.Any<string>());
         }
 
-        [Theory]
-        [InlineData("text", false, "*[name()='text']")]
-        [InlineData("text", true, "*[local-name()='text']")]
-        public void when_creating_xpath_tag_with_reserved_names(string tagName, bool isLocalName, string expectedResult)
+        [Fact]
+        public void when_creating_xpath_local_tag_with_valid_values()
         {
-            var result = XPathBuilder.GetTagNamePart(tagName, isLocalName);
-            result.ShouldBe(expectedResult);
+            var result = _builder.GetTagNamePart("validTagName", isLocalName: true);
+            result.ShouldBe("*[local-name()='validTagName']");
+
+            _xPathValidator.DidNotReceiveWithAnyArgs().ValidateQName(Arg.Any<string>(), Arg.Any<string>());
+            _xPathValidator.Received(1).ValidateNCName("validTagName", "Tag Name");
+            _xPathValidator.DidNotReceiveWithAnyArgs().IsReservedFunctionName(Arg.Any<string>());
+
+            _cssValidator.DidNotReceiveWithAnyArgs().ValidateClassName(Arg.Any<string>());
+        }
+
+        [Fact]
+        public void then_creating_xpath_tag_with_reserved_name()
+        {
+            _xPathValidator.IsReservedFunctionName("reserved:Name").Returns(true);
+
+            var result = _builder.GetTagNamePart("reserved:Name");
+            result.ShouldBe("*[name()='reserved:Name']");
+
+            _xPathValidator.Received(1).ValidateQName("reserved:Name", "Tag Name");
+            _xPathValidator.DidNotReceiveWithAnyArgs().ValidateNCName(Arg.Any<string>(), Arg.Any<string>());
+            _xPathValidator.Received(1).IsReservedFunctionName("reserved:Name");
+
+            _cssValidator.DidNotReceiveWithAnyArgs().ValidateClassName(Arg.Any<string>());
         }
 
         #endregion
@@ -51,50 +70,52 @@ namespace pbdq.Tests.Selenium.FX.Tests.Helpers.XPathBuilderTests
         [Fact]
         public void when_creating_xpath_local_tag_with_null_value()
         {
-            var exception = Should.Throw<ArgumentNullException>(() => XPathBuilder.GetTagNamePart(null, isLocalName: true));
+            var exception = Should.Throw<ArgumentNullException>(() => _builder.GetTagNamePart(null, isLocalName: true));
 
             exception.ShouldNotBeNull();
-            exception.Message.ShouldBe("Tag Name cannot be null.");
+            exception.Message.ShouldStartWith("Tag Name cannot be null.");
+
+            _xPathValidator.DidNotReceiveWithAnyArgs().IsReservedFunctionName(Arg.Any<string>());
+            _xPathValidator.DidNotReceiveWithAnyArgs().ValidateQName(Arg.Any<string>(), Arg.Any<string>());
+            _xPathValidator.DidNotReceiveWithAnyArgs().ValidateNCName(Arg.Any<string>(), Arg.Any<string>());
+
+            _cssValidator.DidNotReceiveWithAnyArgs().ValidateClassName(Arg.Any<string>());
         }
 
-        [Theory]
-        [InlineData("", "Tag Name cannot be empty.")]
-        [InlineData(" div", "Tag Name contains invalid character “ ” at position 0.")]
-        [InlineData("di v", "Tag Name contains invalid character “ ” at position 2.")]
-        [InlineData("div ", "Tag Name contains invalid character “ ” at position 3.")]
-        [InlineData("di\tv", "Tag Name contains invalid character “\t” at position 2.")]
-        [InlineData("di\"v", "Tag Name contains invalid character “\"” at position 2.")]
-        [InlineData("di'v", "Tag Name contains invalid character “'” at position 2.")]
-        [InlineData(":div", "Tag Name contains invalid character “:” at position 0.")]
-        [InlineData("div:", "Tag Name contains invalid character “:” at position 3.")]
-        [InlineData("abc::div", "Tag Name contains invalid character “:” at position 3.")]
-        [InlineData("abc:div:", "Tag Name contains invalid character “:” at position 7.")]
-        [InlineData("abc:def:div", "Tag Name contains invalid character “:” at position 7.")]
-        public void when_creating_xpath_tag_with_invalid_tag_name(string tagName, string expectedErrorMessage)
+        [Fact]
+        public void when_creating_xpath_tag_with_invalid_tag_name()
         {
-            var exception = Should.Throw<ArgumentException>(() => XPathBuilder.GetTagNamePart(tagName));
+            _xPathValidator.When(x => x.ValidateQName(" invalid:Tag", "Tag Name"))
+                .Do(x => throw new ArgumentException("Tag Name contains invalid character “ ” at position 0."));
+
+            var exception = Should.Throw<ArgumentException>(() => _builder.GetTagNamePart(" invalid:Tag"));
 
             exception.ShouldNotBeNull();
-            exception.Message.ShouldBe(expectedErrorMessage);
+            exception.Message.ShouldBe("Tag Name contains invalid character “ ” at position 0.");
+
+            _xPathValidator.DidNotReceiveWithAnyArgs().IsReservedFunctionName(Arg.Any<string>());
+            _xPathValidator.Received(1).ValidateQName(" invalid:Tag", "Tag Name");
+            _xPathValidator.DidNotReceiveWithAnyArgs().ValidateNCName(Arg.Any<string>(), Arg.Any<string>());
+
+            _cssValidator.DidNotReceiveWithAnyArgs().ValidateClassName(Arg.Any<string>());
         }
 
-        [Theory]
-        [InlineData("", "Tag Name cannot be empty.")]
-        [InlineData(" div", "Tag Name contains invalid character “ ” at position 0.")]
-        [InlineData("di v", "Tag Name contains invalid character “ ” at position 2.")]
-        [InlineData("div ", "Tag Name contains invalid character “ ” at position 3.")]
-        [InlineData("di\tv", "Tag Name contains invalid character “\t” at position 2.")]
-        [InlineData("di\"v", "Tag Name contains invalid character “\"” at position 2.")]
-        [InlineData("di'v", "Tag Name contains invalid character “'” at position 2.")]
-        [InlineData(":div", "Tag Name contains invalid character “:” at position 0.")]
-        [InlineData("di:v", "Tag Name contains invalid character “:” at position 2.")]
-        [InlineData("div:", "Tag Name contains invalid character “:” at position 3.")]
-        public void when_creating_xpath_local_tag_with_invalid_tag_name(string tagName, string expectedErrorMessage)
+        [Fact]
+        public void when_creating_xpath_local_tag_with_invalid_tag_name()
         {
-            var exception = Should.Throw<ArgumentException>(() => XPathBuilder.GetTagNamePart(tagName, isLocalName: true));
+            _xPathValidator.When(x => x.ValidateNCName(" invalidTag", "Tag Name"))
+                .Do(x => throw new ArgumentException("Tag Name contains invalid character “ ” at position 0."));
+
+            var exception = Should.Throw<ArgumentException>(() => _builder.GetTagNamePart(" invalidTag", isLocalName: true));
 
             exception.ShouldNotBeNull();
-            exception.Message.ShouldBe(expectedErrorMessage);
+            exception.Message.ShouldBe("Tag Name contains invalid character “ ” at position 0.");
+
+            _xPathValidator.DidNotReceiveWithAnyArgs().IsReservedFunctionName(Arg.Any<string>());
+            _xPathValidator.DidNotReceiveWithAnyArgs().ValidateQName(Arg.Any<string>(), Arg.Any<string>());
+            _xPathValidator.Received(1).ValidateNCName(" invalidTag", "Tag Name");
+
+            _cssValidator.DidNotReceiveWithAnyArgs().ValidateClassName(Arg.Any<string>());
         }
 
         #endregion

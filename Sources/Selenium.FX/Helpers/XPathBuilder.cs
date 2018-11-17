@@ -4,21 +4,36 @@ using System.Text;
 using pbdq.Tests.Selenium.FX.Helpers.Validators;
 
 [assembly: InternalsVisibleTo("Selenium.FX.Tests")]
+[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]
 
 namespace pbdq.Tests.Selenium.FX.Helpers
 {
-    internal static class XPathBuilder
+    internal interface IXPathBuilder
+    {
+        string GetTagNamePart(string tagName, bool isLocalName = false);
+        string GetAttributePart(string attributeName, string attributeValue);
+        string GetCssClassPart(string cssClass);
+        string GetTextPart(string text, bool isPartial = false);
+    }
+
+    internal class XPathBuilder : IXPathBuilder
     {
         private static readonly Exception NullException = null;
-        private static ICssValidator _cssValidator = new CssValidator();
-        private static IXPathValidator _xPathValidator = new XPathValidator();
+        private readonly ICssValidator _cssValidator;
+        private readonly IXPathValidator _xPathValidator;
 
-        internal static string GetTagNamePart(string tagName, bool isLocalName = false)
+        public XPathBuilder(IXPathValidator xPathValidator, ICssValidator cssValidator)
+        {
+            _cssValidator = cssValidator;
+            _xPathValidator = xPathValidator;
+        }
+
+        public string GetTagNamePart(string tagName, bool isLocalName = false)
         {
             if (tagName == null)
             {
                 return isLocalName
-                    ? throw new ArgumentNullException("Tag Name cannot be null.", NullException)
+                    ? throw new ArgumentNullException(nameof(tagName), "Tag Name cannot be null.")
                     : "*";
             }
 
@@ -36,7 +51,7 @@ namespace pbdq.Tests.Selenium.FX.Helpers
             return tagName;
         }
 
-        internal static string GetAttributePart(string attributeName, string attributeValue)
+        public string GetAttributePart(string attributeName, string attributeValue)
         {
             if (attributeName != null)
                 _xPathValidator.ValidateQName(attributeName, "Attribute Name");
@@ -56,7 +71,7 @@ namespace pbdq.Tests.Selenium.FX.Helpers
         }
 
         // from: https://devhints.io/xpath#class-check
-        internal static string GetCssClassPart(string cssClass)
+        public string GetCssClassPart(string cssClass)
         {
             if (cssClass == null)
                 throw new ArgumentNullException("CSS Class Name cannot be null.", NullException);
@@ -68,7 +83,7 @@ namespace pbdq.Tests.Selenium.FX.Helpers
             return $"[contains(concat(' ',normalize-space(@class),' '),' {encodedValue} ')]";
         }
 
-        internal static string GetTextPart(string text, bool isPartial = false)
+        public string GetTextPart(string text, bool isPartial = false)
         {
             if (text == null)
                 return "[text()]";
