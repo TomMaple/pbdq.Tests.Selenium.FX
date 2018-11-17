@@ -45,7 +45,7 @@ namespace pbdq.Tests.Selenium.FX.Tests.Helpers.XPathBuilderTests
             var exception = Should.Throw<ArgumentNullException>(() => _builder.GetCssClassPart(null));
 
             exception.ShouldNotBeNull();
-            exception.Message.ShouldBe("CSS Class Name cannot be null.");
+            exception.Message.ShouldStartWith("CSS Class Name cannot be null.");
 
             _cssValidator.DidNotReceiveWithAnyArgs().ValidateClassName(Arg.Any<string>());
 
@@ -57,10 +57,13 @@ namespace pbdq.Tests.Selenium.FX.Tests.Helpers.XPathBuilderTests
         [Fact]
         public void when_creating_xpath_css_class_with_invalid_value()
         {
+            _cssValidator.When(x => x.ValidateClassName(" invalid value "))
+                .Do(x => throw new ArgumentException("Exception message."));
+
             var exception = Should.Throw<ArgumentException>(() => _builder.GetCssClassPart(" invalid value "));
 
             exception.ShouldNotBeNull();
-            exception.Message.ShouldBe("CSS Class Name contains invalid character “ ” at position 0.");
+            exception.Message.ShouldBe("Exception message.");
 
             _cssValidator.Received(1).ValidateClassName(" invalid value ");
 
