@@ -18,7 +18,6 @@ namespace pbdq.Tests.Selenium.FX.Helpers
 
     internal class XPathBuilder : IXPathBuilder
     {
-        private static readonly Exception NullException = null;
         private readonly ICssValidator _cssValidator;
         private readonly IXPathValidator _xPathValidator;
 
@@ -74,7 +73,7 @@ namespace pbdq.Tests.Selenium.FX.Helpers
         public string GetCssClassPart(string cssClass)
         {
             if (cssClass == null)
-                throw new ArgumentNullException("CSS Class Name cannot be null.", NullException);
+                throw new ArgumentNullException(nameof(cssClass), "CSS Class Name cannot be null.");
 
             _cssValidator.ValidateClassName(cssClass);
 
@@ -101,7 +100,7 @@ namespace pbdq.Tests.Selenium.FX.Helpers
         private static string EncodeAttributeValue(string attributeValue)
         {
             if (attributeValue == null)
-                throw new ArgumentNullException("Value to decode cannot be null.", NullException);
+                throw new ArgumentNullException(nameof(attributeValue), "Value to decode cannot be null.");
 
             var decodedOutput = new StringBuilder();
             foreach (var character in attributeValue)
