@@ -17,6 +17,7 @@ namespace pbdq.Tests.Selenium.FX.Tests.Helpers.Validators.XPathValidatorTests
         [Theory]
         [InlineData("a")]
         [InlineData("LI")]
+        [InlineData("Div")]
         [InlineData("div")]
         [InlineData("text")]
         [InlineData("abc:table")]

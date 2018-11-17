@@ -26,13 +26,13 @@ namespace pbdq.Tests.Selenium.FX.Tests.Helpers.Validators.XPathValidatorTests
         [InlineData("a9")]
         [InlineData("á")]
         [InlineData("书")]
-        public void when_validating_qName_with_valid_values(string qName)
+        public void when_validating_ncName_with_valid_values(string qName)
         {
             Should.NotThrow(() => _validator.ValidateNCName(qName, "Tag Name"));
         }
 
         [Fact]
-        public void when_validating_qName_with_null_value()
+        public void when_validating_ncName_with_null_value()
         {
             var exception = Should.Throw<ArgumentNullException>(() => _validator.ValidateNCName(null, "Tag Name"));
             exception.ShouldNotBeNull();
@@ -58,7 +58,7 @@ namespace pbdq.Tests.Selenium.FX.Tests.Helpers.Validators.XPathValidatorTests
         [InlineData("abc:div", "Tag Name contains invalid character “:” at position 3.")]
         [InlineData("abc:div:", "Tag Name contains invalid character “:” at position 3.")]
         [InlineData("abc:def:div", "Tag Name contains invalid character “:” at position 3.")]
-        public void when_validating_qName_with_invalid_values(string qName, string expectedErrorMessage)
+        public void when_validating_ncName_with_invalid_values(string qName, string expectedErrorMessage)
         {
             var exception = Should.Throw<ArgumentException>(() => _validator.ValidateNCName(qName, "Tag Name"));
             exception.ShouldNotBeNull();
